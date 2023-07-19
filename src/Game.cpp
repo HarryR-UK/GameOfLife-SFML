@@ -22,6 +22,7 @@ Game::Game()
     initFont();
     initText();
 
+    m_window->setMouseCursorVisible(false);
     m_gameOfLife.setWindow(*m_window);
 
 
