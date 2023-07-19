@@ -45,8 +45,11 @@ class GameOfLife
         bool m_isSpaceHeld;
         bool m_isPaused;
         bool m_isRHeld;
+        bool m_isCHeld;
 
         int m_neighbourNumbers;
+
+        sf::RectangleShape m_tileSelector;
         
 
     public:

@@ -9,6 +9,8 @@ GameOfLife::GameOfLife()
     m_isSpaceHeld = false;
     m_isPaused = true;
     m_isRHeld = false;
+    m_isCHeld = false;
+
 
 
     initGrid();
@@ -52,6 +54,11 @@ void GameOfLife::initGrid()
             (*m_shapeMap)[x][y].setPosition(x * m_gridSizeF, y * m_gridSizeF);
         }
     }
+
+    m_tileSelector.setSize(sf::Vector2f(m_gridSizeF, m_gridSizeF));
+    m_tileSelector.setFillColor(sf::Color::Transparent);
+    m_tileSelector.setOutlineThickness(1);
+    m_tileSelector.setOutlineColor(sf::Color::Green);
 
 }
 
@@ -101,12 +108,15 @@ void GameOfLife::render(sf::RenderTarget &target)
             target.draw((*m_shapeMap)[x][y]);
         }
     }
+
+    target.draw(m_tileSelector);
 }
 
 void GameOfLife::getInput()
 {
     if(m_isPaused)
     {
+        // SPAWN NEW LIFE
         if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
             if(!m_isMouseHeld)
@@ -126,6 +136,7 @@ void GameOfLife::getInput()
             m_isMouseHeld = false;
         }
 
+        // REFRESH
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::R))
         {
             if(!m_isRHeld)
@@ -140,6 +151,24 @@ void GameOfLife::getInput()
         }
         else{
             m_isRHeld = false;
+        }
+
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::C))
+        {
+            if(!m_isCHeld)
+            {
+                m_isCHeld = true;
+                for(int x = 0; x < m_mapSize; x++)
+                {
+                    for(int y = 0; y < m_mapSize; y++)
+                    {
+                        (*m_currentMap)[x][y] = 0;
+                    }
+                }
+            }
+        }
+        else {
+            m_isCHeld = false;
         }
 
         for(int x = 0; x < m_mapSize; x++)
@@ -178,17 +207,18 @@ void GameOfLife::getInput()
 
 void GameOfLife::update(float deltaTime,int delaySim)
 {
+
+    m_simThread = std::thread(&GameOfLife::simulate, this, delaySim);
+    
     getInput();
     updateMousePos();
-    //simulate();
+
+    m_tileSelector.setPosition(m_mousePosGrid.x * m_gridSizeF, m_mousePosGrid.y * m_gridSizeF);
 
 
 
-    if(!m_isPaused )
-    {
-        m_simThread = std::thread(&GameOfLife::simulate, this, delaySim);
-        m_simThread.join();
-    }
+    m_simThread.join();
+
     
 
 
@@ -196,93 +226,37 @@ void GameOfLife::update(float deltaTime,int delaySim)
 
 void GameOfLife::simulate(int delaySim)
 {
-    usleep(delaySim);
-    for(int x = 0; x < m_mapSize; x++)
+    if(!m_isPaused)
     {
-        for(int y = 0; y < m_mapSize; y++)
+
+        usleep(delaySim);
+        for(int x = 0; x < m_mapSize; x++)
         {
-            (*m_swapMap)[x][y] = isAlive(*m_currentMap,x,y) ? 1 : 0;
-        }
-    }
-    for(int x = 0; x < m_mapSize; x++)
-    {
-        for(int y = 0; y < m_mapSize; y++)
-        {
-            if((*m_swapMap)[x][y] == 1)
+            for(int y = 0; y < m_mapSize; y++)
             {
-                (*m_shapeMap)[x][y].setFillColor(sf::Color::White);
+                (*m_swapMap)[x][y] = isAlive(*m_currentMap,x,y) ? 1 : 0;
             }
-            else{
-                (*m_shapeMap)[x][y].setFillColor(sf::Color::Black);
-            }
-
         }
-    }
-    std::copy(m_swapMap->begin(), m_swapMap->end(), m_currentMap->begin());
-}
+        for(int x = 0; x < m_mapSize; x++)
+        {
+            for(int y = 0; y < m_mapSize; y++)
+            {
+                if((*m_swapMap)[x][y] == 1)
+                {
+                    (*m_shapeMap)[x][y].setFillColor(sf::Color::White);
+                }
+                else{
+                    (*m_shapeMap)[x][y].setFillColor(sf::Color::Black);
+                }
 
-/*
-void GameOfLife::checkHorizontal(int x, int y)
-{
-
-    // HORIZONTAL CHECKS
-    // RIGHT
-    if(x < m_mapSize  && m_map[x+1][y].m_state == 1)
-    {
-        m_neighbourNumbers++;
-    }
-    //LEFT
-    if(x > 0 && m_map[x-1][y].m_state == 1)
-    {
-        m_neighbourNumbers++;
+            }
+        }
+        std::copy(m_swapMap->begin(), m_swapMap->end(), m_currentMap->begin());
     }
 
 
 }
 
-void GameOfLife::checkVertical(int x, int y)
-{
-
-
-    //VERTICAL
-    //BELOW
-    if(y < m_mapSize - 1 && m_map[x][y+1].m_state == 1)
-    {
-        m_neighbourNumbers ++;
-    }
-
-    // ABOVE
-    if(y > 0 && m_map[x][y-1].m_state == 1)
-    {
-        m_neighbourNumbers ++;
-    }
-
-}
-
-void GameOfLife::checkDiagnonal(int x, int y)
-{
-
-    // DIAGONAL
-    // Top right
-    if(x < m_mapSize && y < m_mapSize - 1 && m_map[x+1][y+1].m_state == 1)
-    {
-        m_neighbourNumbers ++;
-    }
-    if(x > 0 && y < m_mapSize - 1 && m_map[x-1][y+1].m_state == 1)
-    {
-        m_neighbourNumbers ++;
-    }
-
-    if(x < m_mapSize && y > 0 && m_map[x+1][y-1].m_state == 1 )
-    {
-        m_neighbourNumbers ++;
-    }
-    if(x > 0 && y > 0 && m_map[x-1][y-1].m_state == 1)
-    {
-        m_neighbourNumbers ++;
-    }
-}
-*/
 
 void GameOfLife::setWindow(sf::RenderWindow &window)
 {
