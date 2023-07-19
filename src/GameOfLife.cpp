@@ -7,6 +7,7 @@ GameOfLife::GameOfLife()
     m_isMouseHeld = false;
     m_isSpaceHeld = false;
     m_isPaused = true;
+    m_isRHeld = false;
 
 
     initGrid();
@@ -20,36 +21,29 @@ GameOfLife::~GameOfLife()
 
 void GameOfLife::initGrid()
 {
-    m_mapSize = 100;
-    m_gridSizeF = 10.f;
+    m_mapSize = 40;
+    m_gridSizeF = 25.f;
     m_gridSizeU = static_cast<unsigned>(m_gridSizeF);
 
-    m_currentMap.resize(m_mapSize, std::vector<unsigned int>());
+    m_currentMap.resize(m_mapSize, std::vector<int>(m_mapSize));
     for(int x = 0; x < m_mapSize; x++)
     {
-        m_currentMap[x].resize(m_mapSize, int());
+        //m_currentMap[x].resize(m_mapSize, int());
         for(int y = 0; y < m_mapSize; y++)
         {
             m_currentMap[x][y] = 0;
         }
     }
 
-    m_swapMap.resize(m_mapSize, std::vector<unsigned int>());
+    m_swapMap.resize(m_mapSize, std::vector<int>(m_mapSize));
+
+    std::copy(m_currentMap.begin(), m_currentMap.end(), m_swapMap.begin());
+
+
+    m_shapeMap.resize(m_mapSize, std::vector<sf::RectangleShape>(m_mapSize));
     for(int x = 0; x<m_mapSize; x++)
     {
-        m_swapMap[x].resize(m_mapSize, int());
-        for(int y = 0; y < m_mapSize; y++)
-        {
-            m_swapMap[x][y] = m_currentMap[x][y];
-        }
-    }
-
-
-
-    m_shapeMap.resize(m_mapSize, std::vector<sf::RectangleShape>());
-    for(int x = 0; x<m_mapSize; x++)
-    {
-        m_shapeMap[x].resize(m_mapSize, sf::RectangleShape());
+        //m_shapeMap[x].resize(m_mapSize, sf::RectangleShape());
         for(int y = 0; y < m_mapSize; y++)
         {
             m_shapeMap[x][y].setSize(sf::Vector2f(m_gridSizeF,m_gridSizeF));
@@ -134,6 +128,22 @@ void GameOfLife::getInput()
             m_isMouseHeld = false;
         }
 
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+        {
+            if(!m_isRHeld)
+            {
+                m_isRHeld = true;
+
+                for(auto &row : m_currentMap)
+                {
+                    std::generate(row.begin(), row.end(), []() {return rand() % 10 == 0 ? 1 : 0;});
+                }
+            }
+        }
+        else{
+            m_isRHeld = false;
+        }
+
         for(int x = 0; x < m_mapSize; x++)
         {
             for(int y = 0; y < m_mapSize; y++)
@@ -149,6 +159,12 @@ void GameOfLife::getInput()
                 }
             }
         }
+
+
+        std::copy(m_currentMap.begin(), m_currentMap.end(), m_swapMap.begin());
+
+
+
     }
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
@@ -174,7 +190,6 @@ void GameOfLife::update(float deltaTime,int delaySim)
 
     if(!m_isPaused )
     {
-        //THREAD LATER
         m_simThread = std::thread(&GameOfLife::simulate, this, delaySim);
         m_simThread.join();
     }
@@ -185,7 +200,7 @@ void GameOfLife::update(float deltaTime,int delaySim)
 
 void GameOfLife::simulate(int delaySim)
 {
-    usleep(5000);
+    usleep(delaySim);
     for(int x = 0; x < m_mapSize; x++)
     {
         for(int y = 0; y < m_mapSize; y++)
@@ -206,6 +221,7 @@ void GameOfLife::simulate(int delaySim)
                 m_shapeMap[x][y].setFillColor(sf::Color::Black);
                 m_shapeMap[x][y].setOutlineColor(sf::Color::White);
             }
+
         }
     }
     std::copy(m_swapMap.begin(), m_swapMap.end(), m_currentMap.begin());
@@ -289,7 +305,7 @@ sf::Vector2u GameOfLife::getMouseGrid()
     return m_mousePosGrid;
 }
 
-bool GameOfLife::isAlive(std::vector<std::vector<unsigned int>> &currentMap, const int x,const int y)
+bool GameOfLife::isAlive(std::vector<std::vector<int>> &currentMap, const int x,const int y)
 {
 
     

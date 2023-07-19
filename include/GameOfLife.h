@@ -9,6 +9,9 @@
 #include <unistd.h>
 #include <thread>
 
+#define MAP_SIZE 60
+
+
 class GameOfLife
 {
     private:
@@ -23,8 +26,8 @@ class GameOfLife
         sf::RectangleShape m_gridShape;
         int m_mapSize;
 
-        std::vector<std::vector<unsigned int> > m_currentMap;
-        std::vector<std::vector<unsigned int> > m_swapMap;
+        std::vector<std::vector<int> > m_currentMap;
+        std::vector<std::vector<int> > m_swapMap;
         std::vector<std::vector<sf::RectangleShape>> m_shapeMap;
 
 
@@ -42,6 +45,7 @@ class GameOfLife
         bool m_isMouseHeld;
         bool m_isSpaceHeld;
         bool m_isPaused;
+        bool m_isRHeld;
 
         int m_neighbourNumbers;
         
@@ -65,7 +69,7 @@ class GameOfLife
         void checkVertical(int x, int y);
         void checkDiagnonal(int x, int y);
 
-        bool isAlive(std::vector<std::vector<unsigned int>> &currentMap,const int x,const int y);
+        bool isAlive(std::vector<std::vector<int>> &currentMap,const int x,const int y);
 
 };
 
