@@ -13,8 +13,11 @@ This program uses C++ and the SFML library to visually represent these rules, to
 # Controls
 
 > **SPACE** is used to start and stop the simulation
+>
 > **LEFT CLICK** is used to flip live / dead cells when the game is paused
+>
 > **R** will reset the randomised cells when the game is paused
+> 
 > **C** will clear the cells entirely when the game is paused
 
 # IMAGES
