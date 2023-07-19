@@ -1,4 +1,5 @@
 #include "../include/GameOfLife.h"
+#include <array>
 #include <iostream>
 #include <vector>
 
@@ -21,36 +22,34 @@ GameOfLife::~GameOfLife()
 
 void GameOfLife::initGrid()
 {
-    m_mapSize = 40;
-    m_gridSizeF = 25.f;
+    //m_mapSize = MAP_SIZE;
+    m_gridSizeF = 5.f;
     m_gridSizeU = static_cast<unsigned>(m_gridSizeF);
 
-    m_currentMap.resize(m_mapSize, std::vector<int>(m_mapSize));
+    m_currentMap = new std::array<std::array<int, m_mapSize>, m_mapSize>;
+    m_swapMap = new std::array<std::array<int, m_mapSize>, m_mapSize>;
+    m_shapeMap = new std::array<std::array<sf::RectangleShape, m_mapSize>, m_mapSize>;
+
     for(int x = 0; x < m_mapSize; x++)
     {
-        //m_currentMap[x].resize(m_mapSize, int());
         for(int y = 0; y < m_mapSize; y++)
         {
-            m_currentMap[x][y] = 0;
+            (*m_currentMap)[x][y] = 0;
         }
     }
 
-    m_swapMap.resize(m_mapSize, std::vector<int>(m_mapSize));
 
-    std::copy(m_currentMap.begin(), m_currentMap.end(), m_swapMap.begin());
+    std::copy(m_currentMap->begin(), m_currentMap->end(), m_swapMap->begin());
 
 
-    m_shapeMap.resize(m_mapSize, std::vector<sf::RectangleShape>(m_mapSize));
     for(int x = 0; x<m_mapSize; x++)
     {
         //m_shapeMap[x].resize(m_mapSize, sf::RectangleShape());
         for(int y = 0; y < m_mapSize; y++)
         {
-            m_shapeMap[x][y].setSize(sf::Vector2f(m_gridSizeF,m_gridSizeF));
-            m_shapeMap[x][y].setFillColor(sf::Color::Black);
-            m_shapeMap[x][y].setPosition(x * m_gridSizeF, y * m_gridSizeF);
-            m_shapeMap[x][y].setOutlineThickness(0.3f);
-            m_shapeMap[x][y].setOutlineColor(sf::Color::White);
+            (*m_shapeMap)[x][y].setSize(sf::Vector2f(m_gridSizeF,m_gridSizeF));
+            (*m_shapeMap)[x][y].setFillColor(sf::Color::Black);
+            (*m_shapeMap)[x][y].setPosition(x * m_gridSizeF, y * m_gridSizeF);
         }
     }
 
@@ -58,7 +57,7 @@ void GameOfLife::initGrid()
 
 void GameOfLife::initStartingLives()
 {
-    for(auto &row : m_currentMap)
+    for(auto &row : *m_currentMap)
     {
         std::generate(row.begin(), row.end(), []() {return rand() % 10 == 0 ? 1 : 0;});
     }
@@ -67,10 +66,9 @@ void GameOfLife::initStartingLives()
     {
         for(int y = 0; y < m_mapSize; y++)
         {
-            if(m_currentMap[x][y] == 1)
+            if((*m_currentMap)[x][y] == 1)
             {
-                m_shapeMap[x][y].setFillColor(sf::Color::White);
-                m_shapeMap[x][y].setOutlineColor(sf::Color::Black);
+                (*m_shapeMap)[x][y].setFillColor(sf::Color::White);
             }
         }
     }
@@ -100,7 +98,7 @@ void GameOfLife::render(sf::RenderTarget &target)
     {
         for(int y = 0; y < m_mapSize; y++)
         {
-            target.draw(m_shapeMap[x][y]);
+            target.draw((*m_shapeMap)[x][y]);
         }
     }
 }
@@ -114,13 +112,13 @@ void GameOfLife::getInput()
             if(!m_isMouseHeld)
             {
                 m_isMouseHeld = true;
-                if(m_currentMap[m_mousePosGrid.x][m_mousePosGrid.y] == 0)
+                if((*m_currentMap)[m_mousePosGrid.x][m_mousePosGrid.y] == 0)
                 {
-                    m_currentMap[m_mousePosGrid.x][m_mousePosGrid.y] = 1;
+                    (*m_currentMap)[m_mousePosGrid.x][m_mousePosGrid.y] = 1;
                 }
                 else{
 
-                    m_currentMap[m_mousePosGrid.x][m_mousePosGrid.y] = 0;
+                    (*m_currentMap)[m_mousePosGrid.x][m_mousePosGrid.y] = 0;
                 }
             }
         }
@@ -134,7 +132,7 @@ void GameOfLife::getInput()
             {
                 m_isRHeld = true;
 
-                for(auto &row : m_currentMap)
+                for(auto &row : *m_currentMap)
                 {
                     std::generate(row.begin(), row.end(), []() {return rand() % 10 == 0 ? 1 : 0;});
                 }
@@ -148,20 +146,18 @@ void GameOfLife::getInput()
         {
             for(int y = 0; y < m_mapSize; y++)
             {
-                if(m_currentMap[x][y] == 1)
+                if((*m_currentMap)[x][y] == 1)
                 {
-                    m_shapeMap[x][y].setFillColor(sf::Color::White);
-                    m_shapeMap[x][y].setOutlineColor(sf::Color::Black);
+                    (*m_shapeMap)[x][y].setFillColor(sf::Color::White);
                 }
                 else{
-                    m_shapeMap[x][y].setFillColor(sf::Color::Black);
-                    m_shapeMap[x][y].setOutlineColor(sf::Color::White);
+                    (*m_shapeMap)[x][y].setFillColor(sf::Color::Black);
                 }
             }
         }
 
 
-        std::copy(m_currentMap.begin(), m_currentMap.end(), m_swapMap.begin());
+        std::copy(m_currentMap->begin(), m_currentMap->end(), m_swapMap->begin());
 
 
 
@@ -205,26 +201,24 @@ void GameOfLife::simulate(int delaySim)
     {
         for(int y = 0; y < m_mapSize; y++)
         {
-            m_swapMap[x][y] = isAlive(m_currentMap,x,y) ? 1 : 0;
+            (*m_swapMap)[x][y] = isAlive(*m_currentMap,x,y) ? 1 : 0;
         }
     }
     for(int x = 0; x < m_mapSize; x++)
     {
         for(int y = 0; y < m_mapSize; y++)
         {
-            if(m_swapMap[x][y] == 1)
+            if((*m_swapMap)[x][y] == 1)
             {
-                m_shapeMap[x][y].setFillColor(sf::Color::White);
-                m_shapeMap[x][y].setOutlineColor(sf::Color::Black);
+                (*m_shapeMap)[x][y].setFillColor(sf::Color::White);
             }
             else{
-                m_shapeMap[x][y].setFillColor(sf::Color::Black);
-                m_shapeMap[x][y].setOutlineColor(sf::Color::White);
+                (*m_shapeMap)[x][y].setFillColor(sf::Color::Black);
             }
 
         }
     }
-    std::copy(m_swapMap.begin(), m_swapMap.end(), m_currentMap.begin());
+    std::copy(m_swapMap->begin(), m_swapMap->end(), m_currentMap->begin());
 }
 
 /*
@@ -305,7 +299,7 @@ sf::Vector2u GameOfLife::getMouseGrid()
     return m_mousePosGrid;
 }
 
-bool GameOfLife::isAlive(std::vector<std::vector<int>> &currentMap, const int x,const int y)
+bool GameOfLife::isAlive(std::array<std::array<int, m_mapSize>, m_mapSize> &currentMap, const int &x,const int &y)
 {
 
     

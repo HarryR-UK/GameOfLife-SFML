@@ -1,6 +1,7 @@
 #ifndef GAME_OF_LIFE_H
 #define GAME_OF_LIFE_H
 
+#include <array>
 #pragma once
 
 #include <vector>
@@ -9,9 +10,9 @@
 #include <unistd.h>
 #include <thread>
 
-#define MAP_SIZE 60
 
 
+const int m_mapSize = 300;
 class GameOfLife
 {
     private:
@@ -24,12 +25,10 @@ class GameOfLife
         sf::Text m_gridText;
         
         sf::RectangleShape m_gridShape;
-        int m_mapSize;
 
-        std::vector<std::vector<int> > m_currentMap;
-        std::vector<std::vector<int> > m_swapMap;
-        std::vector<std::vector<sf::RectangleShape>> m_shapeMap;
-
+        std::array<std::array<int, m_mapSize>, m_mapSize>* m_currentMap;
+        std::array<std::array<int, m_mapSize>, m_mapSize>* m_swapMap;
+        std::array<std::array<sf::RectangleShape, m_mapSize>, m_mapSize>* m_shapeMap;
 
         sf::RenderWindow* m_window;
 
@@ -69,7 +68,7 @@ class GameOfLife
         void checkVertical(int x, int y);
         void checkDiagnonal(int x, int y);
 
-        bool isAlive(std::vector<std::vector<int>> &currentMap,const int x,const int y);
+        bool isAlive(std::array<std::array<int, m_mapSize>, m_mapSize> &currentMap,const int &x,const int &y);
 
 };
 
