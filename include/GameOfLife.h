@@ -6,11 +6,9 @@
 #include <vector>
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <unistd.h>
+#include <thread>
 
-struct Cell{
-    sf::RectangleShape m_shape;
-    int m_state;
-};
 class GameOfLife
 {
     private:
@@ -25,7 +23,9 @@ class GameOfLife
         sf::RectangleShape m_gridShape;
         int m_mapSize;
 
-        std::vector<std::vector<Cell>> m_map;
+        std::vector<std::vector<unsigned int> > m_currentMap;
+        std::vector<std::vector<unsigned int> > m_swapMap;
+        std::vector<std::vector<sf::RectangleShape>> m_shapeMap;
 
 
         sf::RenderWindow* m_window;
@@ -36,23 +36,36 @@ class GameOfLife
         sf::Vector2f m_mousePosView;
         sf::Vector2u m_mousePosGrid;
 
-        float m_simDelay;
-        bool m_isHeld;
+        std::thread m_simThread;
+
+
+        bool m_isMouseHeld;
+        bool m_isSpaceHeld;
         bool m_isPaused;
+
+        int m_neighbourNumbers;
         
 
     public:
         GameOfLife();
         virtual ~GameOfLife();
 
-        void update(float delaySim);
+        void update(float deltaTime,int delaySim);
         void updateMousePos();
         void getInput();
 
         void render(sf::RenderTarget &target);
         void setWindow(sf::RenderWindow &window);
         float getGridSizeF();
+
         sf::Vector2u getMouseGrid();
+
+        void simulate(int delaySim);
+        void checkHorizontal(int x, int y);
+        void checkVertical(int x, int y);
+        void checkDiagnonal(int x, int y);
+
+        bool isAlive(std::vector<std::vector<unsigned int>> &currentMap,const int x,const int y);
 
 };
 

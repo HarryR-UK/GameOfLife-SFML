@@ -13,8 +13,8 @@ Game::~Game()
 
 
 Game::Game()
-    : WINDOW_WIDTH(sf::VideoMode::getDesktopMode().width / 1), 
-    WINDOW_HEIGHT(sf::VideoMode::getDesktopMode().height / 1),
+    : WINDOW_WIDTH(sf::VideoMode::getDesktopMode().width / 1.2), 
+    WINDOW_HEIGHT(sf::VideoMode::getDesktopMode().height / 1.2),
     m_gameOfLife()
 {
     initVariables();
@@ -24,10 +24,6 @@ Game::Game()
 
     m_gameOfLife.setWindow(*m_window);
 
-    m_tileSelector.setSize(sf::Vector2f(m_gameOfLife.getGridSizeF(), m_gameOfLife.getGridSizeF()));
-    m_tileSelector.setFillColor(sf::Color::Transparent);
-    m_tileSelector.setOutlineThickness(1.f);
-    m_tileSelector.setOutlineColor(sf::Color::Red);
 
     startGLoop();
 }
@@ -86,19 +82,13 @@ void Game::getInput()
 
 }
 
-void Game::updateMousePos()
-{
-    m_mousePosGrid = m_gameOfLife.getMouseGrid();
-}
 
 void Game::update()
 {
     pollEvents();
     getInput();
-    updateMousePos();
-    m_tileSelector.setPosition(m_mousePosGrid.x * m_gameOfLife.getGridSizeF(), m_mousePosGrid.y * m_gameOfLife.getGridSizeF());
     
-    m_gameOfLife.update(5.f);
+    m_gameOfLife.update(Time::deltaTime,55555);
 
 }
 
@@ -109,7 +99,6 @@ void Game::render()
 
     m_gameOfLife.render(*this->m_window);
 
-    m_window->draw(m_tileSelector);
     m_window->display();
 }
 

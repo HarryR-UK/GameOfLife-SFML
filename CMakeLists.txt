@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(GameOfLife)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
 #
 set(SOURCE_FILES include/Global.h src/main.cpp src/Game.cpp include/Game.h src/Time.cpp include/Time.h src/GameOfLife.cpp include/GameOfLife.h)
 add_executable(GameOfLife ${SOURCE_FILES})

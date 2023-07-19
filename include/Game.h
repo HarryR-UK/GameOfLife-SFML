@@ -35,9 +35,6 @@ class Game
         // FONT
         sf::Font m_mainFont;
 
-        sf::Vector2u m_mousePosGrid;
-        
-        sf::RectangleShape m_tileSelector;
 
         GameOfLife m_gameOfLife;
 
@@ -48,7 +45,6 @@ class Game
         void startGLoop();
 
         void update();
-        void updateMousePos();
 
         void pollEvents();
         void getInput();
