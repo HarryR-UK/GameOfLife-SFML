@@ -96,22 +96,30 @@ void Game::update()
 
 void Game::render()
 {
-    m_window->clear();
+    while(isRunning())
+    {
+        m_window->clear();
 
-    m_gameOfLife.render(*this->m_window);
+        m_gameOfLife.render(*this->m_window);
 
-    m_window->display();
+        m_window->display();
+
+    }
 }
 
 void Game::startGLoop()
 {
+    m_renderThread = std::thread(&Game::render, this);
     while(this->isRunning())
     {
         Time::initDeltaTime();
 
         this->update();
 
-        this->render();
+        
+        //this->render();
+
 
     }
+    m_renderThread.join();
 }

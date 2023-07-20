@@ -1,7 +1,10 @@
 #include <cstdlib>
 #include<iostream>
+#include<SFML/Graphics.hpp>
 
 #include "../include/Game.h"
+
+sf::RenderWindow IGNORE(sf::VideoMode(1,1), "IGNORE", sf::Style::Close);
 
 int main()
 {

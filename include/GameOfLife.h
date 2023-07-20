@@ -12,7 +12,7 @@
 
 
 
-const int m_mapSize = 300;
+const int m_mapSize =500;
 class GameOfLife
 {
     private:
@@ -24,11 +24,13 @@ class GameOfLife
         unsigned m_gridSizeU;
         sf::Text m_gridText;
         
-        sf::RectangleShape m_gridShape;
+        sf::RectangleShape m_aliveCell;
 
         std::array<std::array<int, m_mapSize>, m_mapSize>* m_currentMap;
         std::array<std::array<int, m_mapSize>, m_mapSize>* m_swapMap;
-        std::array<std::array<sf::RectangleShape, m_mapSize>, m_mapSize>* m_shapeMap;
+        
+
+        //std::array<std::array<sf::RectangleShape, m_mapSize>, m_mapSize>* m_shapeMap;
 
         sf::RenderWindow* m_window;
 
@@ -72,7 +74,7 @@ class GameOfLife
         void checkDiagnonal(int x, int y);
 
         bool isAlive(std::array<std::array<int, m_mapSize>, m_mapSize> &currentMap,const int &x,const int &y);
-
+        
 };
 
 

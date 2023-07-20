@@ -22,6 +22,8 @@ GameOfLife::~GameOfLife()
 {
 }
 
+
+
 void GameOfLife::initGrid()
 {
     //m_mapSize = MAP_SIZE;
@@ -30,30 +32,27 @@ void GameOfLife::initGrid()
 
     m_currentMap = new std::array<std::array<int, m_mapSize>, m_mapSize>;
     m_swapMap = new std::array<std::array<int, m_mapSize>, m_mapSize>;
-    m_shapeMap = new std::array<std::array<sf::RectangleShape, m_mapSize>, m_mapSize>;
 
-    for(int x = 0; x < m_mapSize; x++)
+
+    m_aliveCell.setSize(sf::Vector2f(m_gridSizeF, m_gridSizeF));
+    m_aliveCell.setFillColor(sf::Color::White);
+
+
+    for(long unsigned int x = 0; x < m_mapSize; x++)
     {
-        for(int y = 0; y < m_mapSize; y++)
+        for(long unsigned int y = 0; y < m_mapSize; y++)
         {
             (*m_currentMap)[x][y] = 0;
+
         }
     }
+
+
 
 
     std::copy(m_currentMap->begin(), m_currentMap->end(), m_swapMap->begin());
 
 
-    for(int x = 0; x<m_mapSize; x++)
-    {
-        //m_shapeMap[x].resize(m_mapSize, sf::RectangleShape());
-        for(int y = 0; y < m_mapSize; y++)
-        {
-            (*m_shapeMap)[x][y].setSize(sf::Vector2f(m_gridSizeF,m_gridSizeF));
-            (*m_shapeMap)[x][y].setFillColor(sf::Color::Black);
-            (*m_shapeMap)[x][y].setPosition(x * m_gridSizeF, y * m_gridSizeF);
-        }
-    }
 
     m_tileSelector.setSize(sf::Vector2f(m_gridSizeF, m_gridSizeF));
     m_tileSelector.setFillColor(sf::Color::Transparent);
@@ -69,16 +68,6 @@ void GameOfLife::initStartingLives()
         std::generate(row.begin(), row.end(), []() {return rand() % 10 == 0 ? 1 : 0;});
     }
 
-    for(int x = 0; x < m_mapSize; x++)
-    {
-        for(int y = 0; y < m_mapSize; y++)
-        {
-            if((*m_currentMap)[x][y] == 1)
-            {
-                (*m_shapeMap)[x][y].setFillColor(sf::Color::White);
-            }
-        }
-    }
 }
 
 
@@ -101,11 +90,16 @@ void GameOfLife::updateMousePos()
 void GameOfLife::render(sf::RenderTarget &target)
 {
 
-    for(int x = 0; x < m_mapSize; x++)
+    for(long unsigned int x = 0; x < m_mapSize; x++)
     {
-        for(int y = 0; y < m_mapSize; y++)
+        for(long unsigned int y = 0; y < m_mapSize; y++)
         {
-            target.draw((*m_shapeMap)[x][y]);
+            if((*m_currentMap)[x][y] == 1)
+            {
+                m_aliveCell.setPosition(x * m_gridSizeF,y * m_gridSizeF );
+                target.draw(m_aliveCell);
+
+            }
         }
     }
 
@@ -158,9 +152,9 @@ void GameOfLife::getInput()
             if(!m_isCHeld)
             {
                 m_isCHeld = true;
-                for(int x = 0; x < m_mapSize; x++)
+                for(long unsigned int x = 0; x < m_mapSize; x++)
                 {
-                    for(int y = 0; y < m_mapSize; y++)
+                    for(long unsigned int y = 0; y < m_mapSize; y++)
                     {
                         (*m_currentMap)[x][y] = 0;
                     }
@@ -169,20 +163,6 @@ void GameOfLife::getInput()
         }
         else {
             m_isCHeld = false;
-        }
-
-        for(int x = 0; x < m_mapSize; x++)
-        {
-            for(int y = 0; y < m_mapSize; y++)
-            {
-                if((*m_currentMap)[x][y] == 1)
-                {
-                    (*m_shapeMap)[x][y].setFillColor(sf::Color::White);
-                }
-                else{
-                    (*m_shapeMap)[x][y].setFillColor(sf::Color::Black);
-                }
-            }
         }
 
 
@@ -230,25 +210,11 @@ void GameOfLife::simulate(int delaySim)
     {
 
         usleep(delaySim);
-        for(int x = 0; x < m_mapSize; x++)
+        for(long unsigned int x = 0; x < m_mapSize; x++)
         {
-            for(int y = 0; y < m_mapSize; y++)
+            for(long unsigned int y = 0; y < m_mapSize; y++)
             {
                 (*m_swapMap)[x][y] = isAlive(*m_currentMap,x,y) ? 1 : 0;
-            }
-        }
-        for(int x = 0; x < m_mapSize; x++)
-        {
-            for(int y = 0; y < m_mapSize; y++)
-            {
-                if((*m_swapMap)[x][y] == 1)
-                {
-                    (*m_shapeMap)[x][y].setFillColor(sf::Color::White);
-                }
-                else{
-                    (*m_shapeMap)[x][y].setFillColor(sf::Color::Black);
-                }
-
             }
         }
         std::copy(m_swapMap->begin(), m_swapMap->end(), m_currentMap->begin());

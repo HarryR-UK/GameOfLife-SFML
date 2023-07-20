@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <thread>
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -35,6 +36,7 @@ class Game
         // FONT
         sf::Font m_mainFont;
 
+        std::thread m_renderThread;
 
         GameOfLife m_gameOfLife;
 
