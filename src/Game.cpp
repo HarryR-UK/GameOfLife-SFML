@@ -87,6 +87,14 @@ void Game::pollEvents()
                 break;
         }
     }
+
+    if(m_window->hasFocus())
+    {
+        m_window->setMouseCursorVisible(false);
+    }
+    else{
+        m_window->setMouseCursorVisible(true);
+    }
 }
 
 
