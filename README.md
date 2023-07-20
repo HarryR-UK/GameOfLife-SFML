@@ -36,5 +36,7 @@ This program uses C++ and the SFML library to visually represent these rules, to
 
 ![STILL IMAGE](img/GOL2.png)
 
+![DRAW](img/DRAW.png)
+
 # GIFS
 ![GIF](img/gifs/GOLGIF.gif)
