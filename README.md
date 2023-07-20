@@ -22,4 +22,7 @@ This program uses C++ and the SFML library to visually represent these rules, to
 
 # IMAGES
 
-// img
+![STILL IMAGE](img/GOLImage.png)
+
+
+![GIF](img/gifs/GOLGIF_.gif)
