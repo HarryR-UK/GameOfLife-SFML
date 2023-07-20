@@ -35,7 +35,7 @@ void GameOfLife::initGrid()
 
 
     m_aliveCell.setSize(sf::Vector2f(m_gridSizeF, m_gridSizeF));
-    m_aliveCell.setFillColor(sf::Color::White);
+    m_aliveCell.setFillColor(sf::Color::Magenta);
 
 
     for(long unsigned int x = 0; x < m_mapSize; x++)

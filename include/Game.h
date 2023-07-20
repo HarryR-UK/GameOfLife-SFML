@@ -13,6 +13,8 @@
 
 #include "../include/Time.h"
 
+
+
 class Game
 {
     private:
@@ -21,6 +23,7 @@ class Game
 
         sf::Event m_event;
         sf::Cursor m_cursor;
+
 
 
         // Screen Info
@@ -39,6 +42,7 @@ class Game
         std::thread m_renderThread;
 
         GameOfLife m_gameOfLife;
+
 
     public:
         Game();

@@ -39,6 +39,7 @@ void Game::initVariables()
     m_screenHeight = sf::VideoMode::getDesktopMode().height;
 
 
+
 }
 
 void Game::initWindow()
@@ -47,6 +48,8 @@ void Game::initWindow()
     m_videoMode.width = WINDOW_WIDTH;
 
     m_window = new sf::RenderWindow(m_videoMode, "GAME OF LIFE!", sf::Style::Close | sf::Style::None);
+
+
 }
 
 void Game::initFont()
@@ -80,7 +83,6 @@ void Game::pollEvents()
 
 void Game::getInput()
 {
-
 }
 
 
@@ -102,10 +104,12 @@ void Game::render()
 
         m_gameOfLife.render(*this->m_window);
 
+
         m_window->display();
 
     }
 }
+
 
 void Game::startGLoop()
 {
@@ -113,7 +117,7 @@ void Game::startGLoop()
     while(this->isRunning())
     {
         Time::initDeltaTime();
-
+        
         this->update();
 
         

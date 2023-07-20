@@ -10,9 +10,9 @@
 #include <unistd.h>
 #include <thread>
 
+#include "Global.h"
 
-
-const int m_mapSize =500;
+const int m_mapSize =MAP_SIZE;
 class GameOfLife
 {
     private:
@@ -30,7 +30,6 @@ class GameOfLife
         std::array<std::array<int, m_mapSize>, m_mapSize>* m_swapMap;
         
 
-        //std::array<std::array<sf::RectangleShape, m_mapSize>, m_mapSize>* m_shapeMap;
 
         sf::RenderWindow* m_window;
 
@@ -52,6 +51,13 @@ class GameOfLife
         int m_neighbourNumbers;
 
         sf::RectangleShape m_tileSelector;
+
+        // UI
+        sf::Font m_font;
+        sf::Text m_numberOfLiveCellsText;
+        int m_noLiveCells;
+
+        //color changing
         
 
     public:
