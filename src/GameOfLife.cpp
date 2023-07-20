@@ -1,28 +1,83 @@
 #include "../include/GameOfLife.h"
 #include <array>
 #include <iostream>
+#include <sstream>
 #include <vector>
 
+GameOfLife::~GameOfLife()
+{
+}
 GameOfLife::GameOfLife()
 {
+    m_isPaused = true;
+
     m_isMouseHeld = false;
     m_isSpaceHeld = false;
-    m_isPaused = true;
     m_isRHeld = false;
     m_isCHeld = false;
+    m_isFHeld = false;
 
+    m_changeColor = false;
 
+    initColors();
+    initText();
 
     initGrid();
     initStartingLives();
     
 
 }
-GameOfLife::~GameOfLife()
+
+void GameOfLife::initColors()
 {
+    m_colorMagenta = sf::Color::Magenta;
+    m_colorRed = sf::Color::Red;
+    m_colorTimer = COLOR_TIMER_DEFAULT;
+    m_currentColorInt = 0;
+    m_aliveCell.setFillColor(sf::Color::Magenta);
 }
 
+void GameOfLife::initText()
+{
+    if(!m_font.loadFromFile("../res/fonts/open-sans/OpenSans-Bold.ttf"))
+        std::cerr << "ERROR::GAMEOFLIFE::INITEXT:: error loading font from file" << '\n';
 
+    m_numberOfLiveCellsText.setFont(m_font);
+    m_numberOfLiveCellsText.setCharacterSize(20);
+    m_numberOfLiveCellsText.setFillColor(sf::Color::White);
+    m_numberOfLiveCellsText.setPosition(10,10);
+    m_numberOfLiveCellsText.setString("NULL");
+
+    m_noLiveCells = 0;
+
+}
+
+void GameOfLife::updateText()
+{
+    long unsigned int temp = 0;
+    for(int x = 0; x < m_mapSize; ++x)
+    {
+        for(int y = 0; y < m_mapSize; ++y)
+        {
+            if((*m_currentMap)[x][y] == 1)
+            {
+                temp ++;
+            }
+        }
+    }
+    
+    m_noLiveCells = temp;
+    
+    std::string pauseText = m_isPaused ? "TRUE" : "FALSE";
+    std::string colorText = m_changeColor ? "TRUE" : "FALSE";
+
+    std::stringstream ss;
+    ss << "LIVE CELLS: " << m_noLiveCells << '\n'
+        << "PAUSED: " << pauseText << '\n'
+        << "CHANGE COLOR: " << colorText << '\n'
+        ;
+    m_numberOfLiveCellsText.setString(ss.str());
+}
 
 void GameOfLife::initGrid()
 {
@@ -35,7 +90,7 @@ void GameOfLife::initGrid()
 
 
     m_aliveCell.setSize(sf::Vector2f(m_gridSizeF, m_gridSizeF));
-    m_aliveCell.setFillColor(sf::Color::Magenta);
+    m_aliveCell.setFillColor(m_currentColor);
 
 
     for(long unsigned int x = 0; x < m_mapSize; x++)
@@ -70,6 +125,59 @@ void GameOfLife::initStartingLives()
 
 }
 
+void GameOfLife::updateColor(float deltaTime)
+{
+    if(m_changeColor)
+    {
+        m_colorTimer -= deltaTime;
+        if(m_colorTimer < 0)
+        {
+            if(m_currentColorInt < 6)
+            {
+                m_currentColorInt ++;
+            }
+            else{
+                m_currentColorInt = 0;
+            }
+            m_colorTimer = COLOR_TIMER_DEFAULT;
+        }
+        switch(m_currentColorInt)
+        {
+            case Colors::RED:
+                m_currentColor = sf::Color::Red;
+                break;
+            case Colors::MAGENTA:
+                m_currentColor = sf::Color::Magenta;
+                break;
+            case Colors::PINK:
+                m_currentColor = sf::Color(255,3,255);
+                break;
+            case Colors::ORANGE:
+                m_currentColor = sf::Color(255,128,0);
+                break;
+            case Colors::YELLOW:
+                m_currentColor = sf::Color(255,255,51);
+                break;
+            case Colors::GREEN:
+                m_currentColor = sf::Color::Green;
+                break;
+            case Colors::BLUE:
+                m_currentColor = sf::Color(0,255,255);
+                break;
+            default:
+                break;
+        }
+
+    }
+    else{
+        m_currentColor = sf::Color::Magenta;
+    }
+
+
+    m_aliveCell.setFillColor(m_currentColor);
+
+
+}
 
 void GameOfLife::updateMousePos()
 {
@@ -104,6 +212,7 @@ void GameOfLife::render(sf::RenderTarget &target)
     }
 
     target.draw(m_tileSelector);
+    target.draw(m_numberOfLiveCellsText);
 }
 
 void GameOfLife::getInput()
@@ -133,18 +242,10 @@ void GameOfLife::getInput()
         // REFRESH
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::R))
         {
-            if(!m_isRHeld)
+            for(auto &row : *m_currentMap)
             {
-                m_isRHeld = true;
-
-                for(auto &row : *m_currentMap)
-                {
-                    std::generate(row.begin(), row.end(), []() {return rand() % 10 == 0 ? 1 : 0;});
-                }
+                std::generate(row.begin(), row.end(), []() {return rand() % 10 == 0 ? 1 : 0;});
             }
-        }
-        else{
-            m_isRHeld = false;
         }
 
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::C))
@@ -172,6 +273,17 @@ void GameOfLife::getInput()
 
     }
 
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::F))
+    {
+        if(!m_isFHeld)
+        {
+            m_isFHeld = true;
+            m_changeColor = !m_changeColor;
+        }
+    }else
+    {
+        m_isFHeld = false;
+    }
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
     {
         if(!m_isSpaceHeld)
@@ -189,11 +301,14 @@ void GameOfLife::update(float deltaTime,int delaySim)
 {
 
     m_simThread = std::thread(&GameOfLife::simulate, this, delaySim);
+    if(m_window->hasFocus())
+        getInput();
     
-    getInput();
     updateMousePos();
+    updateText();
 
     m_tileSelector.setPosition(m_mousePosGrid.x * m_gridSizeF, m_mousePosGrid.y * m_gridSizeF);
+    updateColor(deltaTime);
 
 
 

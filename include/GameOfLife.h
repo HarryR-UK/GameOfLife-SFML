@@ -1,23 +1,36 @@
 #ifndef GAME_OF_LIFE_H
 #define GAME_OF_LIFE_H
 
-#include <array>
 #pragma once
 
-#include <vector>
+#include <array>
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <unistd.h>
 #include <thread>
+#include <sstream>
 
 #include "Global.h"
 
 const int m_mapSize =MAP_SIZE;
+
+enum Colors
+{
+    RED = 0,
+    MAGENTA = 1,
+    PINK = 2,
+    ORANGE = 3,
+    YELLOW = 4,
+    GREEN = 5,
+    BLUE = 6
+};
 class GameOfLife
 {
     private:
         void initGrid();
         void initStartingLives();
+        void initText();
+        void initColors();
 
         // GRID
         float m_gridSizeF;
@@ -47,6 +60,7 @@ class GameOfLife
         bool m_isPaused;
         bool m_isRHeld;
         bool m_isCHeld;
+        bool m_isFHeld;
 
         int m_neighbourNumbers;
 
@@ -55,9 +69,15 @@ class GameOfLife
         // UI
         sf::Font m_font;
         sf::Text m_numberOfLiveCellsText;
-        int m_noLiveCells;
+        long unsigned int m_noLiveCells;
 
         //color changing
+        bool m_changeColor;
+        sf::Color m_colorMagenta;
+        sf::Color m_colorRed;
+        int m_currentColorInt;
+        sf::Color m_currentColor;
+        float m_colorTimer;
         
 
     public:
@@ -65,8 +85,12 @@ class GameOfLife
         virtual ~GameOfLife();
 
         void update(float deltaTime,int delaySim);
+        void updateColor(float deltaTime);
         void updateMousePos();
+        void updateText();
+
         void getInput();
+
 
         void render(sf::RenderTarget &target);
         void setWindow(sf::RenderWindow &window);
