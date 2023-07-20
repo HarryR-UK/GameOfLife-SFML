@@ -22,9 +22,13 @@ This program uses C++ and the SFML library to visually represent these rules, to
 > 
 > **C** will clear the cells entirely when the game is paused
 >
-> **F** will turn changing colors on / off
+> **F** will turn changing cycling colors on / off
 >
 > **SCROLL WHEEL** will adjust the simulation delay up and down
+>
+> **LEFT ARROW KEY** will cycle left through the colors when cycle color is false
+>
+> **RIGHT ARROW KEY** will cycle right through the colors when cycle color is false
 
 # IMAGES
 

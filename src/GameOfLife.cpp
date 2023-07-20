@@ -16,6 +16,8 @@ GameOfLife::GameOfLife()
     m_isRHeld = false;
     m_isCHeld = false;
     m_isFHeld = false;
+    m_isRightHeld = false;
+    m_isLeftHeld = false;
 
     m_changeColor = false;
 
@@ -79,7 +81,7 @@ void GameOfLife::updateText()
     std::stringstream ss;
     ss << "LIVE CELLS: " << m_noLiveCells << '\n'
         << "PAUSED: " << pauseText << '\n'
-        << "CHANGE COLOR: " << colorText << '\n'
+        << "CYCLE COLOR: " << colorText << '\n'
         << "SIMULATION DELAY: " << m_simDelay << '\n'
         ;
     m_numberOfLiveCellsText.setString(ss.str());
@@ -147,39 +149,68 @@ void GameOfLife::updateColor(float deltaTime)
             }
             m_colorTimer = COLOR_TIMER_DEFAULT;
         }
-        switch(m_currentColorInt)
-        {
-            case Colors::RED:
-                m_currentColor = sf::Color::Red;
-                break;
-            case Colors::MAGENTA:
-                m_currentColor = sf::Color::Magenta;
-                break;
-            case Colors::PINK:
-                m_currentColor = sf::Color(255,3,255);
-                break;
-            case Colors::ORANGE:
-                m_currentColor = sf::Color(255,128,0);
-                break;
-            case Colors::YELLOW:
-                m_currentColor = sf::Color(255,255,51);
-                break;
-            case Colors::GREEN:
-                m_currentColor = sf::Color::Green;
-                break;
-            case Colors::BLUE:
-                m_currentColor = sf::Color(0,255,255);
-                break;
-            default:
-                break;
-        }
 
     }
     else{
-        m_currentColor = sf::Color::Magenta;
+        
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        {
+            if(!m_isRightHeld)
+            {
+                m_isRightHeld = true;
+                if(m_currentColorInt < 6)
+                    m_currentColorInt++;
+                else
+                    m_currentColorInt = 0;
+            }
+        }
+        else{
+            m_isRightHeld = false;
+        }
+
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+        {
+            if(!m_isLeftHeld)
+            {
+                m_isLeftHeld = true;
+                if(m_currentColorInt >-1)
+                    m_currentColorInt--;
+                else
+                    m_currentColorInt = 6;
+            }
+        }
+        else{
+            m_isLeftHeld = false;
+        }
     }
 
 
+    switch(m_currentColorInt)
+    {
+        case Colors::RED:
+            m_currentColor = sf::Color::Red;
+            break;
+        case Colors::MAGENTA:
+            m_currentColor = sf::Color::Magenta;
+            break;
+        case Colors::PINK:
+            m_currentColor = sf::Color(255,3,255);
+            break;
+        case Colors::ORANGE:
+            m_currentColor = sf::Color(255,128,0);
+            break;
+        case Colors::YELLOW:
+            m_currentColor = sf::Color(255,255,51);
+            break;
+        case Colors::GREEN:
+            m_currentColor = sf::Color::Green;
+            break;
+        case Colors::BLUE:
+            m_currentColor = sf::Color(0,255,255);
+            break;
+        default:
+            break;
+    }
     m_aliveCell.setFillColor(m_currentColor);
 
 

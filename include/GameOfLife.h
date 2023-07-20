@@ -62,6 +62,8 @@ class GameOfLife
         bool m_isRHeld;
         bool m_isCHeld;
         bool m_isFHeld;
+        bool m_isRightHeld;
+        bool m_isLeftHeld;
 
         int m_neighbourNumbers;
 
