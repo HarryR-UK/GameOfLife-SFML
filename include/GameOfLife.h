@@ -12,7 +12,8 @@
 
 #include "Global.h"
 
-const int m_mapSize =MAP_SIZE;
+const int m_mapSizeX = MAP_SIZE_X;
+const int m_mapSizeY = MAP_SIZE_Y;
 
 enum Colors
 {
@@ -39,8 +40,8 @@ class GameOfLife
         
         sf::RectangleShape m_aliveCell;
 
-        std::array<std::array<int, m_mapSize>, m_mapSize>* m_currentMap;
-        std::array<std::array<int, m_mapSize>, m_mapSize>* m_swapMap;
+        std::array<std::array<int, m_mapSizeY>, m_mapSizeX>* m_currentMap;
+        std::array<std::array<int, m_mapSizeY>, m_mapSizeX>* m_swapMap;
         
 
 
@@ -79,18 +80,21 @@ class GameOfLife
         sf::Color m_currentColor;
         float m_colorTimer;
         
+        int m_simDelay;
 
     public:
         GameOfLife();
         virtual ~GameOfLife();
 
-        void update(float deltaTime,int delaySim);
+        void update(float deltaTime, int delaySim);
         void updateColor(float deltaTime);
         void updateMousePos();
         void updateText();
 
         void getInput();
 
+        void startSimThread();
+        void joinSimThread();
 
         void render(sf::RenderTarget &target);
         void setWindow(sf::RenderWindow &window);
@@ -98,12 +102,12 @@ class GameOfLife
 
         sf::Vector2u getMouseGrid();
 
-        void simulate(int delaySim);
+        void simulate();
         void checkHorizontal(int x, int y);
         void checkVertical(int x, int y);
         void checkDiagnonal(int x, int y);
 
-        bool isAlive(std::array<std::array<int, m_mapSize>, m_mapSize> &currentMap,const int &x,const int &y);
+        bool isAlive(std::array<std::array<int, m_mapSizeY>, m_mapSizeX> &currentMap,const int &x,const int &y);
         
 };
 

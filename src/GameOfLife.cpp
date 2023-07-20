@@ -27,6 +27,11 @@ GameOfLife::GameOfLife()
     
 
 }
+void GameOfLife::joinSimThread()
+{
+    m_simThread.join();
+
+}
 
 void GameOfLife::initColors()
 {
@@ -55,9 +60,9 @@ void GameOfLife::initText()
 void GameOfLife::updateText()
 {
     long unsigned int temp = 0;
-    for(int x = 0; x < m_mapSize; ++x)
+    for(int x = 0; x < m_mapSizeX; ++x)
     {
-        for(int y = 0; y < m_mapSize; ++y)
+        for(int y = 0; y < m_mapSizeY; ++y)
         {
             if((*m_currentMap)[x][y] == 1)
             {
@@ -75,6 +80,7 @@ void GameOfLife::updateText()
     ss << "LIVE CELLS: " << m_noLiveCells << '\n'
         << "PAUSED: " << pauseText << '\n'
         << "CHANGE COLOR: " << colorText << '\n'
+        << "SIMULATION DELAY: " << m_simDelay << '\n'
         ;
     m_numberOfLiveCellsText.setString(ss.str());
 }
@@ -82,20 +88,20 @@ void GameOfLife::updateText()
 void GameOfLife::initGrid()
 {
     //m_mapSize = MAP_SIZE;
-    m_gridSizeF = 5.f;
+    m_gridSizeF = 3.f;
     m_gridSizeU = static_cast<unsigned>(m_gridSizeF);
 
-    m_currentMap = new std::array<std::array<int, m_mapSize>, m_mapSize>;
-    m_swapMap = new std::array<std::array<int, m_mapSize>, m_mapSize>;
+    m_currentMap = new std::array<std::array<int, m_mapSizeY>, m_mapSizeX>;
+    m_swapMap = new std::array<std::array<int, m_mapSizeY>, m_mapSizeX>;
 
 
     m_aliveCell.setSize(sf::Vector2f(m_gridSizeF, m_gridSizeF));
     m_aliveCell.setFillColor(m_currentColor);
 
 
-    for(long unsigned int x = 0; x < m_mapSize; x++)
+    for(long unsigned int x = 0; x < m_mapSizeX; x++)
     {
-        for(long unsigned int y = 0; y < m_mapSize; y++)
+        for(long unsigned int y = 0; y < m_mapSizeY; y++)
         {
             (*m_currentMap)[x][y] = 0;
 
@@ -198,9 +204,9 @@ void GameOfLife::updateMousePos()
 void GameOfLife::render(sf::RenderTarget &target)
 {
 
-    for(long unsigned int x = 0; x < m_mapSize; x++)
+    for(long unsigned int x = 0; x < m_mapSizeX; x++)
     {
-        for(long unsigned int y = 0; y < m_mapSize; y++)
+        for(long unsigned int y = 0; y < m_mapSizeY; y++)
         {
             if((*m_currentMap)[x][y] == 1)
             {
@@ -222,21 +228,12 @@ void GameOfLife::getInput()
         // SPAWN NEW LIFE
         if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
-            if(!m_isMouseHeld)
-            {
-                m_isMouseHeld = true;
-                if((*m_currentMap)[m_mousePosGrid.x][m_mousePosGrid.y] == 0)
-                {
-                    (*m_currentMap)[m_mousePosGrid.x][m_mousePosGrid.y] = 1;
-                }
-                else{
-
-                    (*m_currentMap)[m_mousePosGrid.x][m_mousePosGrid.y] = 0;
-                }
-            }
+                (*m_currentMap)[m_mousePosGrid.x][m_mousePosGrid.y] = 1;
         }
-        else{
-            m_isMouseHeld = false;
+        // DEAD
+        if(sf::Mouse::isButtonPressed(sf::Mouse::Right))
+        {
+                (*m_currentMap)[m_mousePosGrid.x][m_mousePosGrid.y] = 0;
         }
 
         // REFRESH
@@ -253,9 +250,9 @@ void GameOfLife::getInput()
             if(!m_isCHeld)
             {
                 m_isCHeld = true;
-                for(long unsigned int x = 0; x < m_mapSize; x++)
+                for(long unsigned int x = 0; x < m_mapSizeX; x++)
                 {
-                    for(long unsigned int y = 0; y < m_mapSize; y++)
+                    for(long unsigned int y = 0; y < m_mapSizeY; y++)
                     {
                         (*m_currentMap)[x][y] = 0;
                     }
@@ -297,44 +294,53 @@ void GameOfLife::getInput()
     }
 }
 
+void GameOfLife::startSimThread()
+{
+    m_simThread = std::thread(&GameOfLife::simulate, this);
+
+}
+
 void GameOfLife::update(float deltaTime,int delaySim)
 {
 
-    m_simThread = std::thread(&GameOfLife::simulate, this, delaySim);
+    m_simDelay = delaySim;
+    updateMousePos();
+    m_tileSelector.setPosition(m_mousePosGrid.x * m_gridSizeF, m_mousePosGrid.y * m_gridSizeF);
     if(m_window->hasFocus())
         getInput();
-    
-    updateMousePos();
     updateText();
+    
 
-    m_tileSelector.setPosition(m_mousePosGrid.x * m_gridSizeF, m_mousePosGrid.y * m_gridSizeF);
     updateColor(deltaTime);
 
 
-
-    m_simThread.join();
 
     
 
 
 }
 
-void GameOfLife::simulate(int delaySim)
+void GameOfLife::simulate()
 {
-    if(!m_isPaused)
+    while(m_window->isOpen())
     {
-
-        usleep(delaySim);
-        for(long unsigned int x = 0; x < m_mapSize; x++)
+        if(!m_isPaused)
         {
-            for(long unsigned int y = 0; y < m_mapSize; y++)
+
+            usleep(m_simDelay);
+            for(long unsigned int x = 0; x < m_mapSizeX; x++)
             {
-                (*m_swapMap)[x][y] = isAlive(*m_currentMap,x,y) ? 1 : 0;
+                for(long unsigned int y = 0; y < m_mapSizeY; y++)
+                {
+                    (*m_swapMap)[x][y] = isAlive(*m_currentMap,x,y) ? 1 : 0;
+                }
             }
+            std::copy(m_swapMap->begin(), m_swapMap->end(), m_currentMap->begin());
         }
-        std::copy(m_swapMap->begin(), m_swapMap->end(), m_currentMap->begin());
+
     }
 
+    m_simThread.join();
 
 }
 
@@ -354,7 +360,7 @@ sf::Vector2u GameOfLife::getMouseGrid()
     return m_mousePosGrid;
 }
 
-bool GameOfLife::isAlive(std::array<std::array<int, m_mapSize>, m_mapSize> &currentMap, const int &x,const int &y)
+bool GameOfLife::isAlive(std::array<std::array<int, m_mapSizeY>, m_mapSizeX> &currentMap, const int &x,const int &y)
 {
 
     
@@ -364,11 +370,11 @@ bool GameOfLife::isAlive(std::array<std::array<int, m_mapSize>, m_mapSize> &curr
     if(x > 0 && currentMap[x-1][y] == 1)
         m_neighbourNumbers +=1;
     // RIGHT
-    if(x < m_mapSize  && currentMap[x+1][y] == 1)
+    if(x < m_mapSizeX  && currentMap[x+1][y] == 1)
         m_neighbourNumbers+= 1;
 
     //BELOW
-    if(y < m_mapSize - 1 && currentMap[x][y+1] == 1)
+    if(y < m_mapSizeY - 1 && currentMap[x][y+1] == 1)
         m_neighbourNumbers +=1;
 
     // ABOVE
@@ -379,13 +385,13 @@ bool GameOfLife::isAlive(std::array<std::array<int, m_mapSize>, m_mapSize> &curr
     if(y > 0 && x > 0 && currentMap[x-1][y-1] == 1)
         m_neighbourNumbers +=1;
 
-    if(y > 0 && x < m_mapSize && currentMap[x+1][y-1] == 1)
+    if(y > 0 && x < m_mapSizeX && currentMap[x+1][y-1] == 1)
         m_neighbourNumbers +=1;
     
-    if(y < m_mapSize && x > 0 && currentMap[x-1][y+1] == 1)
+    if(y < m_mapSizeY && x > 0 && currentMap[x-1][y+1] == 1)
         m_neighbourNumbers+=1;
 
-    if(y < m_mapSize && x < m_mapSize && currentMap[x+1][y+1] == 1)
+    if(y < m_mapSizeY && x < m_mapSizeX && currentMap[x+1][y+1] == 1)
         m_neighbourNumbers +=1;
 
 

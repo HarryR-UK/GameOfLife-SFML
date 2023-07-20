@@ -27,11 +27,13 @@ Game::Game()
 
 
     startGLoop();
+
 }
 
 
 void Game::initVariables()
 {
+    m_simDelay = 55555;
     m_window = nullptr;
     
 
@@ -74,6 +76,13 @@ void Game::pollEvents()
             case sf::Event::Closed:
                 m_window->close();
                 break;
+            case sf::Event::MouseWheelMoved:
+                if(m_simDelay > 0)
+                    m_simDelay += 1000 * (m_event.mouseWheel.delta);
+                else{
+                    m_simDelay = 10;
+                }
+                break;
             default:
                 break;
         }
@@ -83,6 +92,7 @@ void Game::pollEvents()
 
 void Game::getInput()
 {
+
 }
 
 
@@ -90,8 +100,12 @@ void Game::update()
 {
     pollEvents();
     getInput();
+
+    if(m_simDelay < 0){
+        m_simDelay = 10;
+    }
     
-    m_gameOfLife.update(Time::deltaTime,55555);
+    m_gameOfLife.update(Time::deltaTime,m_simDelay);
 
 }
 
@@ -113,6 +127,7 @@ void Game::render()
 
 void Game::startGLoop()
 {
+    m_gameOfLife.startSimThread();
     m_renderThread = std::thread(&Game::render, this);
     while(this->isRunning())
     {
@@ -125,5 +140,6 @@ void Game::startGLoop()
 
 
     }
+    m_gameOfLife.joinSimThread();
     m_renderThread.join();
 }

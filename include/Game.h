@@ -24,6 +24,8 @@ class Game
         sf::Event m_event;
         sf::Cursor m_cursor;
 
+        int m_simDelay;
+
 
 
         // Screen Info
