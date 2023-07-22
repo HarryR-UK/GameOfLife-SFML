@@ -36,7 +36,6 @@ void Game::initVariables()
 {
     m_simDelay = 55555;
     m_window = nullptr;
-    m_viewMoveSpeed = 10;
     
 
     m_screenWidth = sf::VideoMode::getDesktopMode().width;
@@ -53,10 +52,6 @@ void Game::initWindow()
 
     m_window = new sf::RenderWindow(m_videoMode, "GAME OF LIFE!", sf::Style::Close | sf::Style::None);
 
-    m_view.setSize(m_window->getSize().x, m_window->getSize().y);
-    m_view.setCenter(m_window->getSize().x / 2.f, m_window->getSize().y / 2.f);
-
-    m_window->setView(m_view);
 
 }
 
@@ -103,11 +98,6 @@ void Game::pollEvents()
 void Game::getInput()
 {
 
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-    {
-        std::cout << "MOVING VIEW" << '\n';
-        m_view.move(0, m_viewMoveSpeed * Time::deltaTime);
-    }
 
 }
 

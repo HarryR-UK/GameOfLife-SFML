@@ -21,8 +21,6 @@ class Game
         sf::RenderWindow* m_window;
         sf::VideoMode m_videoMode;
 
-        sf::View m_view;
-        float m_viewMoveSpeed;
 
         sf::Event m_event;
         sf::Cursor m_cursor;
