@@ -12,8 +12,8 @@
 
 #include "Global.h"
 
-const int m_mapSizeX = MAP_SIZE_X;
-const int m_mapSizeY = MAP_SIZE_Y;
+constexpr int m_mapSizeX = MAP_SIZE_X;
+constexpr int m_mapSizeY = MAP_SIZE_Y;
 
 enum Colors
 {

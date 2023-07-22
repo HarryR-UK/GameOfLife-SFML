@@ -1,6 +1,7 @@
 #include "../include/GameOfLife.h"
 #include <array>
 #include <iostream>
+#include <iterator>
 #include <sstream>
 #include <vector>
 
@@ -41,12 +42,15 @@ void GameOfLife::initColors()
     m_colorRed = sf::Color::Red;
     m_colorTimer = COLOR_TIMER_DEFAULT;
     m_currentColorInt = 0;
+
     m_aliveCell.setFillColor(sf::Color::Magenta);
+    m_aliveCell.setOutlineThickness(1);
+    m_aliveCell.setOutlineColor(sf::Color::Black);
 }
 
 void GameOfLife::initText()
 {
-    if(!m_font.loadFromFile("../res/fonts/open-sans/OpenSans-Bold.ttf"))
+    if(!m_font.loadFromFile("../res/fonts/open-sans/OpenSans-Semibold.ttf"))
         std::cerr << "ERROR::GAMEOFLIFE::INITEXT:: error loading font from file" << '\n';
 
     m_numberOfLiveCellsText.setFont(m_font);
@@ -90,14 +94,14 @@ void GameOfLife::updateText()
 void GameOfLife::initGrid()
 {
     //m_mapSize = MAP_SIZE;
-    m_gridSizeF = 3.f;
+    m_gridSizeF = 8.f;
     m_gridSizeU = static_cast<unsigned>(m_gridSizeF);
 
     m_currentMap = new std::array<std::array<int, m_mapSizeY>, m_mapSizeX>;
     m_swapMap = new std::array<std::array<int, m_mapSizeY>, m_mapSizeX>;
 
 
-    m_aliveCell.setSize(sf::Vector2f(m_gridSizeF, m_gridSizeF));
+    m_aliveCell.setSize(sf::Vector2f(m_gridSizeF - m_aliveCell.getOutlineThickness(), m_gridSizeF - m_aliveCell.getOutlineThickness()));
     m_aliveCell.setFillColor(m_currentColor);
 
 
@@ -371,7 +375,6 @@ void GameOfLife::simulate()
 
     }
 
-    m_simThread.join();
 
 }
 
