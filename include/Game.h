@@ -1,5 +1,3 @@
-#include "GameOfLife.h"
-#include "SFML/Graphics/RenderTarget.hpp"
 #ifndef GAME_H
 #pragma once
 
@@ -11,6 +9,8 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
+#include "GameOfLife.h"
+#include "SFML/Graphics/RenderTarget.hpp"
 
 #include "../include/Time.h"
 
