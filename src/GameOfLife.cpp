@@ -7,6 +7,8 @@
 
 GameOfLife::~GameOfLife()
 {
+    delete m_swapMap;
+    delete m_currentMap;
 }
 GameOfLife::GameOfLife()
 {
@@ -121,10 +123,10 @@ void GameOfLife::initGrid()
 
 
 
-    m_tileSelector.setSize(sf::Vector2f(m_gridSizeF, m_gridSizeF));
-    m_tileSelector.setFillColor(sf::Color::Transparent);
     m_tileSelector.setOutlineThickness(1);
     m_tileSelector.setOutlineColor(sf::Color::Green);
+    m_tileSelector.setSize(sf::Vector2f(m_gridSizeF - m_tileSelector.getOutlineThickness(), m_gridSizeF - m_tileSelector.getOutlineThickness()));
+    m_tileSelector.setFillColor(sf::Color::Transparent);
 
 }
 
@@ -219,22 +221,11 @@ void GameOfLife::updateColor(float deltaTime)
 
 
 }
-
-void GameOfLife::updateMousePos()
+void GameOfLife::renderUI(sf::RenderTarget &target)
 {
-    m_mousePosScreen = sf::Mouse::getPosition();
-    m_mousePosWindow = sf::Mouse::getPosition(*m_window);
-    m_mousePosView = m_window->mapPixelToCoords(m_mousePosWindow);
-
-    if(m_mousePosView.x >= 0.f)
-        m_mousePosGrid.x = m_mousePosView.x / m_gridSizeU;
-
-    if(m_mousePosView.y >= 0.f)
-        m_mousePosGrid.y = m_mousePosView.y / m_gridSizeU;
-
-    
-
+    target.draw(m_numberOfLiveCellsText);
 }
+
 
 void GameOfLife::render(sf::RenderTarget &target)
 {
@@ -253,7 +244,6 @@ void GameOfLife::render(sf::RenderTarget &target)
     }
 
     target.draw(m_tileSelector);
-    target.draw(m_numberOfLiveCellsText);
 }
 
 void GameOfLife::getInput()
@@ -339,7 +329,6 @@ void GameOfLife::update(float deltaTime,int delaySim)
 {
 
     m_simDelay = delaySim;
-    updateMousePos();
     m_tileSelector.setPosition(m_mousePosGrid.x * m_gridSizeF, m_mousePosGrid.y * m_gridSizeF);
     if(m_window->hasFocus())
         getInput();
@@ -382,6 +371,11 @@ void GameOfLife::simulate()
 void GameOfLife::setWindow(sf::RenderWindow &window)
 {
     m_window = &window;
+}
+
+void GameOfLife::setMousePosGrid(sf::Vector2u mousePosGrid)
+{
+    m_mousePosGrid = mousePosGrid;
 }
 
 float GameOfLife::getGridSizeF()

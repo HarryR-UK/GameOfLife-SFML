@@ -21,13 +21,16 @@ class Game
         sf::RenderWindow* m_window;
         sf::VideoMode m_videoMode;
 
+        sf::View m_view;
+        float m_viewMoveSpeed;
+
 
         sf::Event m_event;
         sf::Cursor m_cursor;
 
         int m_simDelay;
 
-
+        float m_scrollAmount;
 
         // Screen Info
         int m_screenWidth;
@@ -47,6 +50,14 @@ class Game
         GameOfLife m_gameOfLife;
 
 
+        // MOUSE POS
+        sf::Vector2i m_mousePosScreen;
+        sf::Vector2i m_mousePosWindow;
+        sf::Vector2f m_mousePosView;
+        sf::Vector2u m_mousePosGrid;
+        float m_gridSizeF;
+
+
     public:
         Game();
         virtual ~Game();
@@ -54,6 +65,7 @@ class Game
         void startGLoop();
 
         void update();
+        void updateMousePos();
 
         void pollEvents();
         void getInput();

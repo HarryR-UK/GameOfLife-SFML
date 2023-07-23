@@ -48,9 +48,6 @@ class GameOfLife
         sf::RenderWindow* m_window;
 
         // updateMousePos
-        sf::Vector2i m_mousePosScreen;
-        sf::Vector2i m_mousePosWindow;
-        sf::Vector2f m_mousePosView;
         sf::Vector2u m_mousePosGrid;
 
         std::thread m_simThread;
@@ -90,7 +87,6 @@ class GameOfLife
 
         void update(float deltaTime, int delaySim);
         void updateColor(float deltaTime);
-        void updateMousePos();
         void updateText();
 
         void getInput();
@@ -99,15 +95,14 @@ class GameOfLife
         void joinSimThread();
 
         void render(sf::RenderTarget &target);
-        void setWindow(sf::RenderWindow &window);
+        void renderUI(sf::RenderTarget &target);
         float getGridSizeF();
-
         sf::Vector2u getMouseGrid();
 
+        void setWindow(sf::RenderWindow &window);
+        void setMousePosGrid(sf::Vector2u mousePosGrid);
+
         void simulate();
-        void checkHorizontal(int x, int y);
-        void checkVertical(int x, int y);
-        void checkDiagnonal(int x, int y);
 
         bool isAlive(std::array<std::array<int, m_mapSizeY>, m_mapSizeX> &currentMap,const int &x,const int &y);
         
