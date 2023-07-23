@@ -34,7 +34,7 @@ This program uses C++ and the SFML library for graphics to visually represent th
 >
 > **DOWN ARROW KEY** decreases the simulation delay
 >
-> ** W A S D** will pan around the map
+> **W A S D** will pan around the map
 
 # IMAGES
 
