@@ -23,6 +23,8 @@ This program uses C++ and the SFML library for graphics to visually represent th
 > **C** will clear the cells entirely when the game is paused
 >
 > **F** will turn changing cycling colors on / off
+> 
+> **O** will make the alive cells look more pixelated / less pixelated
 >
 > **SCROLL WHEEL** will zoom in and out
 >
