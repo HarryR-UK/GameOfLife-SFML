@@ -1,4 +1,5 @@
 #include "../include/Game.h"
+#include "SFML/Graphics/RenderTarget.hpp"
 #include "SFML/Window/Keyboard.hpp"
 #include "SFML/Window/Mouse.hpp"
 
@@ -27,6 +28,7 @@ Game::Game()
     m_gameOfLife.setWindow(*m_window);
 
     m_gridSizeF = m_gameOfLife.getGridSizeF();
+    initBoundaries();
 
 
     startGLoop();
@@ -38,13 +40,33 @@ void Game::initVariables()
 {
     m_simDelay = 55555;
     m_window = nullptr;
-    m_scrollAmount = 2;
+    m_scrollAmount = 1.5;
     
 
     m_screenWidth = sf::VideoMode::getDesktopMode().width;
     m_screenHeight = sf::VideoMode::getDesktopMode().height;
 
 
+
+}
+
+void Game::initBoundaries()
+{
+    m_boundaryLeft.setSize(sf::Vector2f(10, m_mapSizeY * m_gridSizeF));
+    m_boundaryLeft.setPosition(sf::Vector2f(0 - m_boundaryLeft.getSize().x - 1, m_window->getSize().y - m_boundaryLeft.getSize().y));
+    m_boundaryLeft.setFillColor(sf::Color(192,192,192));
+
+    m_boundaryRight.setSize(sf::Vector2f(10, m_mapSizeY * m_gridSizeF));
+    m_boundaryRight.setPosition(sf::Vector2f(m_mapSizeX * m_gridSizeF + 1, m_window->getSize().y - m_boundaryLeft.getSize().y));
+    m_boundaryRight.setFillColor(sf::Color(192,192,192));
+
+    m_boundaryUp.setSize(sf::Vector2f(m_mapSizeX * m_gridSizeF, 10));
+    m_boundaryUp.setPosition(sf::Vector2f(0, 0 - m_boundaryUp.getSize().y - 1));
+    m_boundaryUp.setFillColor(sf::Color(192,192,192));
+
+    m_boundaryDown.setSize(sf::Vector2f(m_mapSizeX * m_gridSizeF, 10));
+    m_boundaryDown.setPosition(sf::Vector2f(0, m_window->getSize().y + 1));
+    m_boundaryDown.setFillColor(sf::Color(192,192,192));
 
 }
 
@@ -83,9 +105,17 @@ void Game::pollEvents()
                 if(m_event.mouseWheel.delta >=1)
                 {
                     m_view.zoom(1.f / m_scrollAmount);
+                    if(m_viewMoveSpeed > 0)
+                        m_viewMoveSpeed -= (m_scrollAmount * 2);
+                    else
+                        m_viewMoveSpeed = 1;
                 }
                 if(m_event.mouseWheel.delta <= -1)
                 {
+                    if(m_viewMoveSpeed < 20)
+                        m_viewMoveSpeed += (m_scrollAmount * 2);
+                    else
+                        m_viewMoveSpeed = 20;
                     m_view.zoom(1.5);
                 }
                 break;
@@ -142,8 +172,15 @@ void Game::getInput()
 
 void Game::update()
 {
+    if(m_viewMoveSpeed < 0)
+        m_viewMoveSpeed = 1;
+    
+    if(m_viewMoveSpeed > 20)
+        m_viewMoveSpeed = 20;
+
     pollEvents();
-    getInput();
+    if(m_window->hasFocus())
+        getInput();
 
     if(m_simDelay < 0){
         m_simDelay = 10;
@@ -153,6 +190,14 @@ void Game::update()
 
 }
 
+void Game::renderBoundaries(sf::RenderTarget &target)
+{
+    target.draw(m_boundaryLeft);
+    target.draw(m_boundaryRight);
+
+    target.draw(m_boundaryUp);
+    target.draw(m_boundaryDown);
+}
 
 void Game::render()
 {
@@ -161,6 +206,7 @@ void Game::render()
         m_window->clear();
         m_window->setView(m_view);
 
+        renderBoundaries(*this->m_window);
         m_gameOfLife.render(*this->m_window);
 
         m_window->setView(m_window->getDefaultView());

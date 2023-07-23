@@ -1,4 +1,5 @@
 #include "../include/GameOfLife.h"
+#include "SFML/Window/Keyboard.hpp"
 #include <array>
 #include <iostream>
 #include <iterator>
@@ -21,8 +22,10 @@ GameOfLife::GameOfLife()
     m_isFHeld = false;
     m_isRightHeld = false;
     m_isLeftHeld = false;
+    m_isOHeld = false;
 
     m_changeColor = false;
+    m_isPixel = true;
 
     initColors();
     initText();
@@ -83,11 +86,13 @@ void GameOfLife::updateText()
     
     std::string pauseText = m_isPaused ? "TRUE" : "FALSE";
     std::string colorText = m_changeColor ? "TRUE" : "FALSE";
+    std::string pixelText = m_isPixel ? "TRUE" : "FALSE";
 
     std::stringstream ss;
     ss << "LIVE CELLS: " << m_noLiveCells << '\n'
         << "PAUSED: " << pauseText << '\n'
         << "CYCLE COLOR: " << colorText << '\n'
+        << "PIXELATED: " << pixelText << '\n'
         << "SIMULATION DELAY: " << m_simDelay << '\n'
         ;
     m_numberOfLiveCellsText.setString(ss.str());
@@ -96,7 +101,7 @@ void GameOfLife::updateText()
 void GameOfLife::initGrid()
 {
     //m_mapSize = MAP_SIZE;
-    m_gridSizeF = 8.f;
+    m_gridSizeF = 3.f;
     m_gridSizeU = static_cast<unsigned>(m_gridSizeF);
 
     m_currentMap = new std::array<std::array<int, m_mapSizeY>, m_mapSizeX>;
@@ -123,7 +128,7 @@ void GameOfLife::initGrid()
 
 
 
-    m_tileSelector.setOutlineThickness(1);
+    m_tileSelector.setOutlineThickness(m_aliveCell.getOutlineThickness());
     m_tileSelector.setOutlineColor(sf::Color::Green);
     m_tileSelector.setSize(sf::Vector2f(m_gridSizeF - m_tileSelector.getOutlineThickness(), m_gridSizeF - m_tileSelector.getOutlineThickness()));
     m_tileSelector.setFillColor(sf::Color::Transparent);
@@ -136,6 +141,12 @@ void GameOfLife::initStartingLives()
     {
         std::generate(row.begin(), row.end(), []() {return rand() % 10 == 0 ? 1 : 0;});
     }
+
+}
+
+void GameOfLife::updateTileSelector()
+{
+    m_tileSelector.setPosition(m_mousePosGrid.x * m_gridSizeF, m_mousePosGrid.y * m_gridSizeF);
 
 }
 
@@ -289,10 +300,35 @@ void GameOfLife::getInput()
         }
 
 
+
         std::copy(m_currentMap->begin(), m_currentMap->end(), m_swapMap->begin());
 
 
 
+    }
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::O))
+    {
+        if(!m_isOHeld)
+        {
+            m_isOHeld = true;
+            if(m_aliveCell.getOutlineThickness() == 1)
+            {
+                m_isPixel = false;
+                m_aliveCell.setOutlineThickness(0);
+                m_tileSelector.setOutlineThickness(1);
+                m_tileSelector.setSize(sf::Vector2f(m_gridSizeF, m_gridSizeF));
+            }
+            else
+            {
+                m_isPixel = true;
+                m_aliveCell.setOutlineThickness(1);
+                m_tileSelector.setOutlineThickness(1);
+                m_tileSelector.setSize(sf::Vector2f(m_gridSizeF - 1, m_gridSizeF - 1));
+            }
+        }
+    }
+    else{
+        m_isOHeld = false;
     }
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::F))
@@ -329,7 +365,9 @@ void GameOfLife::update(float deltaTime,int delaySim)
 {
 
     m_simDelay = delaySim;
-    m_tileSelector.setPosition(m_mousePosGrid.x * m_gridSizeF, m_mousePosGrid.y * m_gridSizeF);
+    updateTileSelector();
+    m_aliveCell.setSize(sf::Vector2f(m_gridSizeF - m_aliveCell.getOutlineThickness(), m_gridSizeF - m_aliveCell.getOutlineThickness()));
+
     if(m_window->hasFocus())
         getInput();
     updateText();

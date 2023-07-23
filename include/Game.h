@@ -1,4 +1,5 @@
 #include "GameOfLife.h"
+#include "SFML/Graphics/RenderTarget.hpp"
 #ifndef GAME_H
 #pragma once
 
@@ -41,6 +42,7 @@ class Game
         void initFont();
         void initText();
         void initGrid();
+        void initBoundaries();
 
         // FONT
         sf::Font m_mainFont;
@@ -57,6 +59,11 @@ class Game
         sf::Vector2u m_mousePosGrid;
         float m_gridSizeF;
 
+        // BOUNDARIES
+        sf::RectangleShape m_boundaryLeft;
+        sf::RectangleShape m_boundaryRight;
+        sf::RectangleShape m_boundaryUp;
+        sf::RectangleShape m_boundaryDown;
 
     public:
         Game();
@@ -65,12 +72,14 @@ class Game
         void startGLoop();
 
         void update();
+        void updateTileSelector();
         void updateMousePos();
 
         void pollEvents();
         void getInput();
 
         void render();
+        void renderBoundaries(sf::RenderTarget &target);
 
 
         const bool isRunning() const;

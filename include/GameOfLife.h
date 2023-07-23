@@ -61,6 +61,8 @@ class GameOfLife
         bool m_isFHeld;
         bool m_isRightHeld;
         bool m_isLeftHeld;
+        bool m_isOHeld;
+        bool m_isPixel;
 
         int m_neighbourNumbers;
 
@@ -81,6 +83,8 @@ class GameOfLife
         
         int m_simDelay;
 
+
+
     public:
         GameOfLife();
         virtual ~GameOfLife();
@@ -88,6 +92,7 @@ class GameOfLife
         void update(float deltaTime, int delaySim);
         void updateColor(float deltaTime);
         void updateText();
+        void updateTileSelector();
 
         void getInput();
 
