@@ -1,10 +1,5 @@
 #include "../include/GameOfLife.h"
-#include "SFML/Window/Keyboard.hpp"
-#include <array>
-#include <iostream>
-#include <iterator>
-#include <sstream>
-#include <vector>
+
 
 GameOfLife::~GameOfLife()
 {
@@ -26,6 +21,7 @@ GameOfLife::GameOfLife()
 
     m_changeColor = false;
     m_isPixel = true;
+
 
     initColors();
     initText();
@@ -241,6 +237,8 @@ void GameOfLife::renderUI(sf::RenderTarget &target)
 void GameOfLife::render(sf::RenderTarget &target)
 {
 
+
+
     for(long unsigned int x = 0; x < m_mapSizeX; x++)
     {
         for(long unsigned int y = 0; y < m_mapSizeY; y++)
@@ -414,6 +412,11 @@ void GameOfLife::setWindow(sf::RenderWindow &window)
 void GameOfLife::setMousePosGrid(sf::Vector2u mousePosGrid)
 {
     m_mousePosGrid = mousePosGrid;
+}
+
+void GameOfLife::setView(sf::View &view)
+{
+    this->m_view = &view;
 }
 
 float GameOfLife::getGridSizeF()

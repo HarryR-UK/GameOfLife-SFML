@@ -1,7 +1,4 @@
 #include "../include/Game.h"
-#include "SFML/Graphics/RenderTarget.hpp"
-#include "SFML/Window/Keyboard.hpp"
-#include "SFML/Window/Mouse.hpp"
 
 const bool Game::isRunning() const
 {
@@ -80,6 +77,8 @@ void Game::initWindow()
     m_view.setSize(m_window->getSize().x, m_window->getSize().y);
     m_view.setCenter(m_window->getSize().x / 2.f, m_window->getSize().y /2.f);
     m_viewMoveSpeed = 20.f;
+
+    m_gameOfLife.setView(m_view);
 
 }
 

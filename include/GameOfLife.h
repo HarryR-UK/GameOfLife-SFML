@@ -1,6 +1,8 @@
 #ifndef GAME_OF_LIFE_H
 #define GAME_OF_LIFE_H
 
+#include "SFML/Graphics/View.hpp"
+#include <memory>
 #pragma once
 
 #include <array>
@@ -46,6 +48,7 @@ class GameOfLife
 
 
         sf::RenderWindow* m_window;
+        sf::View* m_view;
 
         // updateMousePos
         sf::Vector2u m_mousePosGrid;
@@ -85,6 +88,7 @@ class GameOfLife
 
 
 
+
     public:
         GameOfLife();
         virtual ~GameOfLife();
@@ -106,6 +110,7 @@ class GameOfLife
 
         void setWindow(sf::RenderWindow &window);
         void setMousePosGrid(sf::Vector2u mousePosGrid);
+        void setView(sf::View &view);
 
         void simulate();
 
